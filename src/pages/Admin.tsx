@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { LayoutDashboard, Utensils, Calendar, Image as ImageIcon, Check, Trash2, Plus, LogOut } from 'lucide-react';
+import { LayoutDashboard, Utensils, Calendar, Image as ImageIcon, Check, Trash2, Plus, LogOut, Pencil } from 'lucide-react';
 
 export default function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -86,6 +86,13 @@ export default function Admin() {
   const handleConfirmReservation = async (id: number) => {
     await fetch(`/api/reservations/${id}/confirm`, { method: 'POST' });
     fetchData();
+  };
+
+  const handleDeleteReservation = async (id: number) => {
+    if (confirm('Are you sure you want to delete this reservation?')) {
+      await fetch(`/api/reservations/${id}`, { method: 'DELETE' });
+      fetchData();
+    }
   };
 
   const handleSaveGallery = async (e: React.FormEvent) => {
@@ -209,7 +216,7 @@ export default function Admin() {
                   <div className="flex justify-between mb-4">
                     <span className="text-xs text-primary uppercase tracking-widest">{item.category}</span>
                     <div className="flex gap-2">
-                      <button onClick={() => setEditingItem(item)} className="text-slate-400 hover:text-white"><Plus className="w-4 h-4" /></button>
+                      <button onClick={() => setEditingItem(item)} className="text-slate-400 hover:text-white"><Pencil className="w-4 h-4" /></button>
                       <button onClick={() => handleDeleteMenu(item.id)} className="text-red-400 hover:text-red-300"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </div>
@@ -248,14 +255,22 @@ export default function Admin() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      {res.status !== 'confirmed' && (
+                      <div className="flex items-center gap-4">
+                        {res.status !== 'confirmed' && (
+                          <button 
+                            onClick={() => handleConfirmReservation(res.id)}
+                            className="text-primary hover:text-primary-dark flex items-center gap-1"
+                          >
+                            <Check className="w-4 h-4" /> Confirm
+                          </button>
+                        )}
                         <button 
-                          onClick={() => handleConfirmReservation(res.id)}
-                          className="text-primary hover:text-primary-dark flex items-center gap-1"
+                          onClick={() => handleDeleteReservation(res.id)}
+                          className="text-red-400 hover:text-red-300"
                         >
-                          <Check className="w-4 h-4" /> Confirm
+                          <Trash2 className="w-4 h-4" />
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -280,7 +295,7 @@ export default function Admin() {
                 <div key={img.id} className="relative group rounded-2xl overflow-hidden aspect-square">
                   <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-4">
-                    <button onClick={() => setEditingItem(img)} className="bg-white text-black p-2 rounded-full"><Plus className="w-4 h-4" /></button>
+                    <button onClick={() => setEditingItem(img)} className="bg-white text-black p-2 rounded-full"><Pencil className="w-4 h-4" /></button>
                     <button onClick={() => handleDeleteGallery(img.id)} className="bg-red-500 text-white p-2 rounded-full"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </div>

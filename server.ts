@@ -124,6 +124,11 @@ async function startServer() {
     res.json({ success: true });
   });
 
+  app.delete("/api/reservations/:id", (req, res) => {
+    db.prepare("DELETE FROM reservations WHERE id = ?").run(req.params.id);
+    res.json({ success: true });
+  });
+
   app.get("/api/gallery", (req, res) => {
     const gallery = db.prepare("SELECT * FROM gallery").all();
     res.json(gallery);
